@@ -22,6 +22,9 @@ function Navbar() {
           <NavLink to="/favorites" className={linkClassName}>
             Favorites
           </NavLink>
+          <NavLink to="/air-quality" className={linkClassName}>
+            Air Quality
+          </NavLink>
         </nav>
         <button
           type="button"

@@ -4,6 +4,7 @@ import { ThemeProvider } from './Componants/ThemeContext'
 import Weather from './Componants/Weather'
 import ComparePage from './Componants/ComparePage'
 import FavoritesPage from './Componants/FavoritesPage'
+import AirQualityPage from './Componants/AirQualityPage'
 import Navbar from './Componants/Navbar'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
               <Route path="/" element={<Weather />} />
               <Route path="/compare" element={<ComparePage />} />
               <Route path="/favorites" element={<FavoritesPage />} />
+              <Route path="/air-quality" element={<AirQualityPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
