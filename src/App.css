@@ -1,8 +1,55 @@
+:root {
+  color-scheme: dark;
+  --page-bg: linear-gradient(135deg, #1e3c72, #2a5298);
+  --page-text: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.84);
+  --surface: rgba(255, 255, 255, 0.15);
+  --surface-strong: rgba(9, 28, 61, 0.84);
+  --surface-soft: rgba(255, 255, 255, 0.12);
+  --surface-border: rgba(255, 255, 255, 0.14);
+  --metric-surface: rgba(9, 28, 61, 0.22);
+  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  --nav-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  --input-bg: rgba(255, 255, 255, 0.96);
+  --input-text: #16324f;
+  --input-placeholder: rgba(22, 50, 79, 0.65);
+  --page-title: #ffffff;
+  --button-bg: #ff7b00;
+  --button-hover: #ff9500;
+  --button-text: #ffffff;
+  --nav-link: rgba(255, 255, 255, 0.84);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --page-bg: linear-gradient(135deg, #f6fbff, #d7eaff);
+  --page-text: #17324d;
+  --text-secondary: rgba(23, 50, 77, 0.78);
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-strong: rgba(255, 255, 255, 0.92);
+  --surface-soft: rgba(255, 255, 255, 0.75);
+  --surface-border: rgba(90, 140, 200, 0.18);
+  --metric-surface: rgba(214, 233, 252, 0.8);
+  --card-shadow: 0 10px 30px rgba(54, 100, 150, 0.12);
+  --nav-shadow: 0 10px 30px rgba(54, 100, 150, 0.14);
+  --input-bg: #ffffff;
+  --input-text: #17324d;
+  --input-placeholder: rgba(23, 50, 77, 0.6);
+  --page-title: #17324d;
+  --nav-link: rgba(23, 50, 77, 0.82);
+}
+
 body {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  color: white;
+  background: var(--page-bg);
+  color: var(--page-text);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+button,
+input {
+  font: inherit;
 }
 
 #root {
@@ -28,18 +75,24 @@ body {
   justify-content: space-between;
   gap: 16px;
   padding: 16px 28px;
-  background: rgba(9, 28, 61, 0.84);
+  background: var(--surface-strong);
   backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  border-bottom: 1px solid var(--surface-border);
+  box-shadow: var(--nav-shadow);
 }
 
 .navBrand {
-  color: #ffffff;
+  color: var(--page-text);
   text-decoration: none;
   font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: 0.4px;
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .navLinks {
@@ -51,7 +104,7 @@ body {
 }
 
 .navLink {
-  color: rgba(255, 255, 255, 0.84);
+  color: var(--nav-link);
   text-decoration: none;
   padding: 10px 16px;
   border-radius: 999px;
@@ -59,14 +112,40 @@ body {
 }
 
 .navLink:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  background: var(--surface-soft);
+  color: var(--page-text);
   transform: translateY(-1px);
 }
 
 .navLink.active {
   background: linear-gradient(135deg, #ff7b00, #ff9f1a);
   color: #ffffff;
+}
+
+.themeToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--surface-soft);
+  color: var(--page-text);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--surface-border);
+  transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.themeToggle:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.themeToggleIcon {
+  font-size: 1.1rem;
+  line-height: 1;
 }
 
 .pageHeader {
@@ -76,22 +155,20 @@ body {
 
 .pageSubtitle {
   margin: 0;
-  opacity: 0.9;
+  color: var(--text-secondary);
 }
 
-/* Container */
 .container {
   text-align: center;
   padding: 20px;
 }
 
-/* Title */
 .title {
   font-size: 32px;
   margin-bottom: 20px;
+  color: var(--page-title);
 }
 
-/* Search */
 .searchBox {
   display: flex;
   justify-content: center;
@@ -105,6 +182,13 @@ body {
   border: none;
   width: 250px;
   outline: none;
+  background: var(--input-bg);
+  color: var(--input-text);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.searchBox input::placeholder {
+  color: var(--input-placeholder);
 }
 
 .searchBox button,
@@ -113,8 +197,8 @@ body {
   padding: 12px 20px;
   border-radius: 25px;
   border: none;
-  background: #ff7b00;
-  color: white;
+  background: var(--button-bg);
+  color: var(--button-text);
   cursor: pointer;
   transition: 0.3s;
 }
@@ -122,7 +206,7 @@ body {
 .searchBox button:hover,
 .favoriteButton:hover,
 .removeFavoriteButton:hover {
-  background: #ff9500;
+  background: var(--button-hover);
 }
 
 .favoriteButton {
@@ -138,15 +222,15 @@ body {
   background: linear-gradient(135deg, #ffd166, #ff7b00);
 }
 
-/* Main Card */
 .mainCard {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--surface);
   padding: 30px;
   border-radius: 20px;
   width: 280px;
   margin: auto;
   backdrop-filter: blur(15px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--card-shadow);
+  color: var(--page-text);
 }
 
 .mainCardHeader {
@@ -166,7 +250,6 @@ body {
   margin: 10px 0;
 }
 
-/* Hourly */
 .hourlyWrapper {
   display: flex;
   justify-content: center;
@@ -179,7 +262,6 @@ body {
   padding: 10px;
 }
 
-/* Daily */
 .daily {
   margin-top: 30px;
   display: grid;
@@ -189,12 +271,14 @@ body {
 }
 
 .dayCard {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--surface);
   border-radius: 15px;
   padding: 15px;
   text-align: center;
   backdrop-filter: blur(10px);
   transition: 0.3s;
+  color: var(--page-text);
+  box-shadow: var(--card-shadow);
 }
 
 .dayCard:hover {
@@ -208,7 +292,7 @@ body {
 .loading {
   margin-top: 10px;
   font-size: 20px;
-  color: #fff;
+  color: var(--page-text);
   animation: blink 1s infinite;
 }
 
@@ -237,12 +321,13 @@ body {
 }
 
 .compareInputCard {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--surface-soft);
+  border: 1px solid var(--surface-border);
   border-radius: 20px;
   padding: 18px;
   backdrop-filter: blur(14px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+  box-shadow: var(--card-shadow);
+  color: var(--page-text);
 }
 
 .compareInputCard label {
@@ -270,11 +355,12 @@ body {
 
 .cityCard {
   min-height: 320px;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--surface);
   padding: 24px;
   border-radius: 20px;
   backdrop-filter: blur(15px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--card-shadow);
+  color: var(--page-text);
 }
 
 .cityHeader {
@@ -322,11 +408,11 @@ body {
   gap: 16px;
   padding: 12px 14px;
   border-radius: 14px;
-  background: rgba(9, 28, 61, 0.22);
+  background: var(--metric-surface);
 }
 
 .metricItem span:first-child {
-  color: rgba(255, 255, 255, 0.86);
+  color: var(--text-secondary);
 }
 
 .metricValue {
@@ -334,15 +420,15 @@ body {
 }
 
 .metricValue.better {
-  color: #63f09b;
+  color: #2bbf6a;
 }
 
 .metricValue.worse {
-  color: #ff7a7a;
+  color: #e45454;
 }
 
 .metricValue.neutral {
-  color: #ffffff;
+  color: var(--page-text);
 }
 
 .cardState {
@@ -362,6 +448,7 @@ body {
 .emptyState {
   text-align: center;
   opacity: 0.9;
+  color: var(--text-secondary);
 }
 
 .favoritesGrid {
@@ -373,13 +460,14 @@ body {
 }
 
 .favoriteCard {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--surface);
   border-radius: 20px;
   padding: 20px;
   backdrop-filter: blur(15px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--card-shadow);
   cursor: pointer;
   transition: transform 0.2s ease, background-color 0.2s ease;
+  color: var(--page-text);
 }
 
 .favoriteCard:hover {
@@ -402,6 +490,7 @@ body {
 .favoriteCardHeader p {
   margin: 0;
   opacity: 0.92;
+  color: var(--text-secondary);
 }
 
 .favoriteIcon {
@@ -423,6 +512,7 @@ body {
   font-size: 0.82rem;
   opacity: 0.8;
   margin-bottom: 4px;
+  color: var(--text-secondary);
 }
 
 .removeFavoriteButton {
@@ -447,6 +537,10 @@ body {
 
   .navbar {
     padding: 14px 18px;
+  }
+
+  .navActions {
+    gap: 8px;
   }
 }
 
