@@ -25,6 +25,9 @@ function Navbar() {
           <NavLink to="/air-quality" className={linkClassName}>
             Air Quality
           </NavLink>
+          <NavLink to="/forecast" className={linkClassName}>
+            Forecast
+          </NavLink>
         </nav>
         <button
           type="button"

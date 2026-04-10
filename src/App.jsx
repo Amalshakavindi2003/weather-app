@@ -5,6 +5,7 @@ import Weather from './Componants/Weather'
 import ComparePage from './Componants/ComparePage'
 import FavoritesPage from './Componants/FavoritesPage'
 import AirQualityPage from './Componants/AirQualityPage'
+import ForecastPage from './Componants/ForecastPage'
 import Navbar from './Componants/Navbar'
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
               <Route path="/compare" element={<ComparePage />} />
               <Route path="/favorites" element={<FavoritesPage />} />
               <Route path="/air-quality" element={<AirQualityPage />} />
+              <Route path="/forecast" element={<ForecastPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>

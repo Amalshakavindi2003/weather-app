@@ -716,3 +716,95 @@ input {
 :root[data-theme='light'] .weatherError {
   color: #b33434;
 }
+.forecastPage {
+  padding-bottom: 28px;
+}
+
+.forecastSearch {
+  margin-bottom: 20px;
+}
+
+.forecastStatus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.forecastError {
+  text-align: center;
+}
+
+.forecastHeader {
+  max-width: 1100px;
+  margin: 0 auto 18px;
+  text-align: center;
+}
+
+.forecastHeader h2 {
+  margin: 0 0 6px;
+  color: var(--page-text);
+}
+
+.forecastHeader p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.forecastChartCard {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 18px 18px 6px;
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(15px);
+}
+
+.forecastCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  max-width: 1100px;
+  margin: 18px auto 0;
+}
+
+.forecastDayCard {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(15px);
+  color: var(--page-text);
+}
+
+.forecastDayDate {
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+
+.forecastDayIcon {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+.forecastDayCondition {
+  margin: 0 0 10px;
+  color: var(--text-secondary);
+}
+
+.forecastDayTemps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .forecastChartCard {
+    padding: 12px 12px 0;
+  }
+}
