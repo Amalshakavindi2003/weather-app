@@ -1,8 +1,7 @@
 import { NavLink } from 'react-router-dom'
 
 function Navbar() {
-  const linkClassName = ({ isActive }) =>
-    `navLink${isActive ? ' active' : ''}`
+  const linkClassName = ({ isActive }) => `navLink${isActive ? ' active' : ''}`
 
   return (
     <header className="navbar">
@@ -15,6 +14,9 @@ function Navbar() {
         </NavLink>
         <NavLink to="/compare" className={linkClassName}>
           Compare
+        </NavLink>
+        <NavLink to="/favorites" className={linkClassName}>
+          Favorites
         </NavLink>
       </nav>
     </header>

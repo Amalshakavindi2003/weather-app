@@ -46,6 +46,8 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .navLink {
@@ -105,7 +107,9 @@ body {
   outline: none;
 }
 
-.searchBox button {
+.searchBox button,
+.favoriteButton,
+.removeFavoriteButton {
   padding: 12px 20px;
   border-radius: 25px;
   border: none;
@@ -115,8 +119,23 @@ body {
   transition: 0.3s;
 }
 
-.searchBox button:hover {
+.searchBox button:hover,
+.favoriteButton:hover,
+.removeFavoriteButton:hover {
   background: #ff9500;
+}
+
+.favoriteButton {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.favoriteButton.saved {
+  background: linear-gradient(135deg, #ffd166, #ff7b00);
 }
 
 /* Main Card */
@@ -128,6 +147,18 @@ body {
   margin: auto;
   backdrop-filter: blur(15px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.mainCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.mainCardHeader h2 {
+  margin: 0;
 }
 
 .mainCard h1 {
@@ -324,6 +355,80 @@ body {
   color: #ffd0d0;
 }
 
+.favoritesPage {
+  padding-bottom: 28px;
+}
+
+.emptyState {
+  text-align: center;
+  opacity: 0.9;
+}
+
+.favoritesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  max-width: 1100px;
+  margin: 24px auto 0;
+}
+
+.favoriteCard {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 20px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.favoriteCard:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.19);
+}
+
+.favoriteCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.favoriteCardHeader h3 {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+}
+
+.favoriteCardHeader p {
+  margin: 0;
+  opacity: 0.92;
+}
+
+.favoriteIcon {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+}
+
+.favoriteCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.favoriteLabel {
+  display: block;
+  font-size: 0.82rem;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+.removeFavoriteButton {
+  padding: 10px 16px;
+}
+
 @media (max-width: 900px) {
   .compareInputs,
   .compareGrid {
@@ -360,5 +465,14 @@ body {
 
   .title {
     font-size: 28px;
+  }
+
+  .mainCard {
+    width: auto;
+  }
+
+  .favoriteCardFooter {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
