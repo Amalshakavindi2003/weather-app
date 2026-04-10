@@ -26,12 +26,12 @@ const Weather = () => {
   const [data, setData] = useState(null)
   const [forecast, setForecast] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [favoriteCities, setFavoriteCities] = useState(() => readFavorites())
   const location = useLocation()
   const navigate = useNavigate()
 
-  const loadWeather = useCallback(
+  const loadWeatherByCity = useCallback(
     async (cityName, options = {}) => {
       const trimmedCity = (cityName ?? '').trim()
 
@@ -39,28 +39,60 @@ const Weather = () => {
 
       try {
         setLoading(true)
-        setError(false)
+        setErrorMessage('')
 
         if (!API_KEY) {
           throw new Error('API key is missing')
         }
 
-        const res = await axiosInstance.get(
+        const weatherResponse = await axiosInstance.get(
           `${Endpoints.weather}?q=${encodeURIComponent(trimmedCity)}&appid=${API_KEY}&units=metric`,
         )
-        const res2 = await axiosInstance.get(
+        const forecastResponse = await axiosInstance.get(
           `${Endpoints.forecast}?q=${encodeURIComponent(trimmedCity)}&appid=${API_KEY}&units=metric`,
         )
 
-        setForecast(res2.data)
-        setData(res.data)
-        setError(false)
+        setForecast(forecastResponse.data)
+        setData(weatherResponse.data)
+        setCity(weatherResponse.data.name)
 
         if (options.updateUrl !== false) {
-          navigate(`/?city=${encodeURIComponent(res.data.name)}`, { replace: true })
+          navigate(`/?city=${encodeURIComponent(weatherResponse.data.name)}`, { replace: true })
         }
       } catch {
-        setError(true)
+        setErrorMessage('Unable to find that city. Please try another city name.')
+        setData(null)
+        setForecast(null)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [navigate],
+  )
+
+  const loadWeatherByCoords = useCallback(
+    async (latitude, longitude) => {
+      try {
+        setLoading(true)
+        setErrorMessage('')
+
+        if (!API_KEY) {
+          throw new Error('API key is missing')
+        }
+
+        const weatherResponse = await axiosInstance.get(
+          `${Endpoints.weather}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`,
+        )
+        const forecastResponse = await axiosInstance.get(
+          `${Endpoints.forecast}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`,
+        )
+
+        setForecast(forecastResponse.data)
+        setData(weatherResponse.data)
+        setCity(weatherResponse.data.name)
+        navigate(`/?city=${encodeURIComponent(weatherResponse.data.name)}`, { replace: true })
+      } catch {
+        setErrorMessage('Unable to load weather for your location right now. Please try again.')
         setData(null)
         setForecast(null)
       } finally {
@@ -76,14 +108,55 @@ const Weather = () => {
 
     if (cityFromQuery) {
       setCity(cityFromQuery)
-      loadWeather(cityFromQuery, { updateUrl: false })
+      loadWeatherByCity(cityFromQuery, { updateUrl: false })
     }
-  }, [location.search, loadWeather])
+  }, [location.search, loadWeatherByCity])
 
   const isFavorite = data ? favoriteCities.includes(data.name.toLowerCase()) : false
 
   const handleSearch = () => {
-    loadWeather(city)
+    loadWeatherByCity(city)
+  }
+
+  const handleUseLocation = () => {
+    if (!navigator.geolocation) {
+      setErrorMessage('Geolocation is not supported by your browser.')
+      return
+    }
+
+    setLoading(true)
+    setErrorMessage('')
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords
+        loadWeatherByCoords(latitude, longitude)
+      },
+      (geoError) => {
+        setLoading(false)
+
+        if (geoError.code === 1) {
+          setErrorMessage('Location permission was denied. Please allow access and try again.')
+          return
+        }
+
+        if (geoError.code === 2) {
+          setErrorMessage('Unable to detect your location. Please try again in a moment.')
+          return
+        }
+
+        if (geoError.code === 3) {
+          setErrorMessage('Location request timed out. Please try again.')
+          return
+        }
+
+        setErrorMessage('Unable to access your location right now. Please try again.')
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+      },
+    )
   }
 
   const handleFavoriteToggle = () => {
@@ -114,11 +187,19 @@ const Weather = () => {
               }
             }}
           />
-          <button onClick={handleSearch}>Search</button>
+          <button type="button" className="locationButton" onClick={handleUseLocation}>
+            📍 Use My Location
+          </button>
+          <button type="button" onClick={handleSearch}>Search</button>
         </div>
 
-        {loading && <p className="loading">Loading...</p>}
-        {error && <p className="loading">City Not Found</p>}
+        {loading && (
+          <div className="weatherStatus" role="status" aria-live="polite">
+            <span className="loadingSpinner" aria-hidden="true" />
+            <p className="loading">Loading weather...</p>
+          </div>
+        )}
+        {!loading && errorMessage && <p className="weatherError">{errorMessage}</p>}
 
         {data && (
           <div className="mainCard">
