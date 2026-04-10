@@ -5,6 +5,78 @@ body {
   color: white;
 }
 
+#root {
+  min-height: 100vh;
+}
+
+.appShell {
+  min-height: 100vh;
+}
+
+.appContent {
+  padding-top: 84px;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 28px;
+  background: rgba(9, 28, 61, 0.84);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.navBrand {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navLink {
+  color: rgba(255, 255, 255, 0.84);
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 999px;
+  transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.navLink:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.navLink.active {
+  background: linear-gradient(135deg, #ff7b00, #ff9f1a);
+  color: #ffffff;
+}
+
+.pageHeader {
+  text-align: center;
+  padding: 0 20px 10px;
+}
+
+.pageSubtitle {
+  margin: 0;
+  opacity: 0.9;
+}
+
 /* Container */
 .container {
   text-align: center;
@@ -55,7 +127,7 @@ body {
   width: 280px;
   margin: auto;
   backdrop-filter: blur(15px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
 .mainCard h1 {
@@ -64,10 +136,9 @@ body {
 }
 
 /* Hourly */
-/*  */
 .hourlyWrapper {
   display: flex;
-  justify-content: center; /* ✅ center whole row */
+  justify-content: center;
 }
 
 .hourly {
@@ -76,6 +147,7 @@ body {
   overflow-x: auto;
   padding: 10px;
 }
+
 /* Daily */
 .daily {
   margin-top: 30px;
@@ -103,7 +175,6 @@ body {
 }
 
 .loading {
- 
   margin-top: 10px;
   font-size: 20px;
   color: #fff;
@@ -111,7 +182,183 @@ body {
 }
 
 @keyframes blink {
-  0% { opacity: 0.3; }
-  50% { opacity: 1; }
-  100% { opacity: 0.3; }
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
+.comparePage {
+  padding: 20px;
+}
+
+.compareInputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  max-width: 1100px;
+  margin: 0 auto 24px;
+}
+
+.compareInputCard {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  padding: 18px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+}
+
+.compareInputCard label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.compareSearchBox {
+  margin-bottom: 0;
+}
+
+.compareSearchBox input {
+  flex: 1;
+  width: auto;
+}
+
+.compareGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.cityCard {
+  min-height: 320px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 24px;
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.cityHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cityHeader h3 {
+  margin: 4px 0 0;
+  font-size: 1.6rem;
+}
+
+.cityLabel {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.78rem;
+  opacity: 0.8;
+}
+
+.weatherIcon {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.conditionText {
+  margin: 8px 0 18px;
+  font-size: 1.05rem;
+  opacity: 0.95;
+}
+
+.metricList {
+  display: grid;
+  gap: 12px;
+}
+
+.metricItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(9, 28, 61, 0.22);
+}
+
+.metricItem span:first-child {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.metricValue {
+  font-weight: 700;
+}
+
+.metricValue.better {
+  color: #63f09b;
+}
+
+.metricValue.worse {
+  color: #ff7a7a;
+}
+
+.metricValue.neutral {
+  color: #ffffff;
+}
+
+.cardState {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.errorState {
+  color: #ffd0d0;
+}
+
+@media (max-width: 900px) {
+  .compareInputs,
+  .compareGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .searchBox {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchBox input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .navbar {
+    padding: 14px 18px;
+  }
+}
+
+@media (max-width: 560px) {
+  .navBrand {
+    font-size: 1rem;
+  }
+
+  .navLinks {
+    gap: 8px;
+  }
+
+  .navLink {
+    padding: 8px 12px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
 }

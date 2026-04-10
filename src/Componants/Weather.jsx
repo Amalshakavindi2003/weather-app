@@ -1,39 +1,47 @@
-import React, { useState } from "react";
-import axiosInstance from "./axiosInstance";
-import Endpoints from "./EndPoints";
+import React, { useState } from 'react'
+import axiosInstance from './axiosInstance'
+import Endpoints from './EndPoints'
 
-const API_KEY = import.meta.env.VITE_API_KEY;
+const API_KEY = import.meta.env.VITE_API_KEY ?? import.meta.env.API_KEY
 
 const Weather = () => {
-  const [city, setCity] = useState("");
-  const [data, setData] = useState(null);
-  const [forecast, setForecast] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [city, setCity] = useState('')
+  const [data, setData] = useState(null)
+  const [forecast, setForecast] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
 
   const api = async () => {
-    if (!city) return;
+    const trimmedCity = city.trim()
+
+    if (!trimmedCity) return
 
     try {
-      setLoading(true);
-      const res = await axiosInstance.get(
-        `${Endpoints.weather}?q=${city}&appid=${API_KEY}&units=metric`,
-      );
-      const res2 = await axiosInstance.get(
-        `${Endpoints.forecast}?q=${city}&appid=${API_KEY}&units=metric`,
-      );
+      setLoading(true)
+      setError(false)
 
-      setForecast(res2.data);
-      setData(res.data);
-      setError(false);
+      if (!API_KEY) {
+        throw new Error('API key is missing')
+      }
+
+      const res = await axiosInstance.get(
+        `${Endpoints.weather}?q=${encodeURIComponent(trimmedCity)}&appid=${API_KEY}&units=metric`,
+      )
+      const res2 = await axiosInstance.get(
+        `${Endpoints.forecast}?q=${encodeURIComponent(trimmedCity)}&appid=${API_KEY}&units=metric`,
+      )
+
+      setForecast(res2.data)
+      setData(res.data)
+      setError(false)
     } catch (err) {
-      setError(true);
-      setData(null);
-      setForecast(null);
+      setError(true)
+      setData(null)
+      setForecast(null)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <>
@@ -45,6 +53,11 @@ const Weather = () => {
             placeholder="Search city..."
             value={city}
             onChange={(e) => setCity(e.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                api()
+              }
+            }}
           />
           <button onClick={api}>Search</button>
         </div>
@@ -55,7 +68,10 @@ const Weather = () => {
         {data && (
           <div className="mainCard">
             <h2>{data.name}</h2>
-            <h1>{data.main.temp}{"\u00B0"}C</h1>
+            <h1>
+              {data.main.temp}
+              {'\u00B0'}C
+            </h1>
             <p>{data.weather[0].main}</p>
             <p>Wind {data.wind.speed} m/s</p>
             <p>Humidity {data.main.humidity}%</p>
@@ -69,11 +85,14 @@ const Weather = () => {
               <div key={i} className="hourBox">
                 <p>
                   {new Date(item.dt_txt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
+                    hour: '2-digit',
+                    minute: '2-digit',
                   })}
                 </p>
-                <h3>{item.main.temp}{"\u00B0"}C</h3>
+                <h3>
+                  {item.main.temp}
+                  {'\u00B0'}C
+                </h3>
               </div>
             ))}
           </div>
@@ -83,24 +102,27 @@ const Weather = () => {
           {forecast?.list
             ?.filter((_, i) => i % 8 === 0)
             .map((item, i) => {
-              const weather = item.weather[0].main;
+              const weather = item.weather[0].main
 
               return (
                 <div key={i} className="dayCard">
-                  <p>{item.dt_txt.split(" ")[0]}</p>
+                  <p>{item.dt_txt.split(' ')[0]}</p>
                   <img
                     src={`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
                     alt="weather"
                   />
                   <p>{weather}</p>
-                  <h3>{item.main.temp}{"\u00B0"}C</h3>
+                  <h3>
+                    {item.main.temp}
+                    {'\u00B0'}C
+                  </h3>
                 </div>
-              );
+              )
             })}
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Weather;
+export default Weather
