@@ -106,6 +106,17 @@ function FavoritesPage() {
     navigate(`/?city=${encodeURIComponent(cityName)}`)
   }
 
+  const handleCardKeyDown = (event, favorite) => {
+    if (favorite.status !== 'ready') {
+      return
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleCardClick(favorite.cityName)
+    }
+  }
+
   return (
     <div className="favoritesPage container">
       <h1 className="title">Favorites</h1>
@@ -126,11 +137,7 @@ function FavoritesPage() {
             onClick={() => favorite.status === 'ready' && handleCardClick(favorite.cityName)}
             role="button"
             tabIndex={0}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                handleCardClick(favorite.cityName)
-              }
-            }}
+            onKeyDown={(event) => handleCardKeyDown(event, favorite)}
           >
             <div className="favoriteCardHeader">
               <div>

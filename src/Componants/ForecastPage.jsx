@@ -33,6 +33,7 @@ function ForecastPage() {
     const trimmedCity = city.trim()
 
     if (!trimmedCity) {
+      setErrorMessage('Please enter a city name.')
       return
     }
 
@@ -89,7 +90,9 @@ function ForecastPage() {
           value={city}
           onChange={(event) => setCity(event.target.value)}
         />
-        <button type="submit">Show Forecast</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Loading...' : 'Show Forecast'}
+        </button>
       </form>
 
       {loading && (

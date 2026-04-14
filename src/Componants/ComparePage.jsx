@@ -40,6 +40,8 @@ function ComparePage() {
   const [rightLoading, setRightLoading] = useState(false)
   const [leftError, setLeftError] = useState('')
   const [rightError, setRightError] = useState('')
+  const [leftValidationError, setLeftValidationError] = useState('')
+  const [rightValidationError, setRightValidationError] = useState('')
 
   useEffect(() => {
     if (!leftRequestId) {
@@ -145,13 +147,31 @@ function ComparePage() {
 
   const handleLeftSubmit = (event) => {
     event.preventDefault()
-    setLeftQuery(leftInput.trim())
+
+    const trimmedCity = leftInput.trim()
+
+    if (!trimmedCity) {
+      setLeftValidationError('Please enter the first city name.')
+      return
+    }
+
+    setLeftValidationError('')
+    setLeftQuery(trimmedCity)
     setLeftRequestId((currentId) => currentId + 1)
   }
 
   const handleRightSubmit = (event) => {
     event.preventDefault()
-    setRightQuery(rightInput.trim())
+
+    const trimmedCity = rightInput.trim()
+
+    if (!trimmedCity) {
+      setRightValidationError('Please enter the second city name.')
+      return
+    }
+
+    setRightValidationError('')
+    setRightQuery(trimmedCity)
     setRightRequestId((currentId) => currentId + 1)
   }
 
@@ -240,10 +260,18 @@ function ComparePage() {
               type="text"
               placeholder="Enter first city"
               value={leftInput}
-              onChange={(event) => setLeftInput(event.target.value)}
+              onChange={(event) => {
+                setLeftInput(event.target.value)
+                if (leftValidationError) {
+                  setLeftValidationError('')
+                }
+              }}
             />
-            <button type="submit">Search</button>
+            <button type="submit" disabled={leftLoading}>
+              {leftLoading ? 'Searching...' : 'Search'}
+            </button>
           </div>
+          {leftValidationError && <p className="inlineFormError">{leftValidationError}</p>}
         </form>
 
         <form className="compareInputCard" onSubmit={handleRightSubmit}>
@@ -254,10 +282,18 @@ function ComparePage() {
               type="text"
               placeholder="Enter second city"
               value={rightInput}
-              onChange={(event) => setRightInput(event.target.value)}
+              onChange={(event) => {
+                setRightInput(event.target.value)
+                if (rightValidationError) {
+                  setRightValidationError('')
+                }
+              }}
             />
-            <button type="submit">Search</button>
+            <button type="submit" disabled={rightLoading}>
+              {rightLoading ? 'Searching...' : 'Search'}
+            </button>
           </div>
+          {rightValidationError && <p className="inlineFormError">{rightValidationError}</p>}
         </form>
       </div>
 

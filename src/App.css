@@ -816,3 +816,12 @@ input {
   margin-bottom: 18px;
   font-size: 0.98rem;
 }
+.inlineFormError {
+  margin: 10px 0 0;
+  color: #ffd0d0;
+  font-size: 0.9rem;
+}
+:root[data-theme='light'] .inlineFormError {
+  color: #b33434;
+}
+
