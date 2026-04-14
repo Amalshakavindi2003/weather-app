@@ -21,6 +21,24 @@ function writeFavorites(favorites) {
   localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites))
 }
 
+function getGreeting(date = new Date()) {
+  const hour = date.getHours()
+
+  if (hour >= 5 && hour < 12) {
+    return 'Good Morning ☀️'
+  }
+
+  if (hour >= 12 && hour < 17) {
+    return 'Good Afternoon 🌤️'
+  }
+
+  if (hour >= 17 && hour < 21) {
+    return 'Good Evening 🌇'
+  }
+
+  return 'Good Night 🌙'
+}
+
 const Weather = () => {
   const [city, setCity] = useState('')
   const [data, setData] = useState(null)
@@ -28,8 +46,19 @@ const Weather = () => {
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [favoriteCities, setFavoriteCities] = useState(() => readFavorites())
+  const [greeting, setGreeting] = useState(() => getGreeting())
   const location = useLocation()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const timerId = window.setInterval(() => {
+      setGreeting(getGreeting())
+    }, 60000)
+
+    setGreeting(getGreeting())
+
+    return () => window.clearInterval(timerId)
+  }, [])
 
   const loadWeatherByCity = useCallback(
     async (cityName, options = {}) => {
@@ -174,7 +203,8 @@ const Weather = () => {
   return (
     <>
       <div className="container">
-        <h1 className="title">Weather App</h1>
+        <h1 className="title weatherGreeting">{greeting}</h1>
+        <p className="pageSubtitle weatherSubtitle">Search any city to get started</p>
         <div className="searchBox">
           <input
             type="text"

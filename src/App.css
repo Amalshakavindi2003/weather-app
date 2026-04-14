@@ -808,3 +808,11 @@ input {
     padding: 12px 12px 0;
   }
 }
+.weatherGreeting {
+  margin-bottom: 6px;
+}
+
+.weatherSubtitle {
+  margin-bottom: 18px;
+  font-size: 0.98rem;
+}
