@@ -825,3 +825,52 @@ input {
   color: #b33434;
 }
 
+.searchBox button:disabled,
+.favoriteButton:disabled,
+.removeFavoriteButton:disabled,
+.secondaryButton:disabled {
+  opacity: 0.68;
+  cursor: not-allowed;
+}
+
+.updatedAt {
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.favoritesToolbar {
+  max-width: 1100px;
+  margin: 14px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.favoritesCount {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.secondaryButton {
+  border: 1px solid var(--surface-border) !important;
+  background: transparent !important;
+  color: var(--page-text) !important;
+}
+
+.secondaryButton:hover {
+  background: var(--surface-soft) !important;
+}
+
+@media (max-width: 560px) {
+  .favoritesToolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .favoritesToolbar .secondaryButton {
+    width: 100%;
+  }
+}

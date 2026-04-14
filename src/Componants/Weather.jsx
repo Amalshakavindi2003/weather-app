@@ -39,6 +39,10 @@ function getGreeting(date = new Date()) {
   return 'Good Night 🌙'
 }
 
+function getLastUpdatedText(date = new Date()) {
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
 const Weather = () => {
   const [city, setCity] = useState('')
   const [data, setData] = useState(null)
@@ -47,6 +51,7 @@ const Weather = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const [favoriteCities, setFavoriteCities] = useState(() => readFavorites())
   const [greeting, setGreeting] = useState(() => getGreeting())
+  const [lastUpdated, setLastUpdated] = useState('')
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -64,7 +69,9 @@ const Weather = () => {
     async (cityName, options = {}) => {
       const trimmedCity = (cityName ?? '').trim()
 
-      if (!trimmedCity) return
+      if (!trimmedCity) {
+        return
+      }
 
       try {
         setLoading(true)
@@ -84,6 +91,7 @@ const Weather = () => {
         setForecast(forecastResponse.data)
         setData(weatherResponse.data)
         setCity(weatherResponse.data.name)
+        setLastUpdated(getLastUpdatedText())
 
         if (options.updateUrl !== false) {
           navigate(`/?city=${encodeURIComponent(weatherResponse.data.name)}`, { replace: true })
@@ -119,6 +127,7 @@ const Weather = () => {
         setForecast(forecastResponse.data)
         setData(weatherResponse.data)
         setCity(weatherResponse.data.name)
+        setLastUpdated(getLastUpdatedText())
         navigate(`/?city=${encodeURIComponent(weatherResponse.data.name)}`, { replace: true })
       } catch {
         setErrorMessage('Unable to load weather for your location right now. Please try again.')
@@ -144,10 +153,21 @@ const Weather = () => {
   const isFavorite = data ? favoriteCities.includes(data.name.toLowerCase()) : false
 
   const handleSearch = () => {
-    loadWeatherByCity(city)
+    const trimmedCity = city.trim()
+
+    if (!trimmedCity) {
+      setErrorMessage('Please enter a city name.')
+      return
+    }
+
+    loadWeatherByCity(trimmedCity)
   }
 
   const handleUseLocation = () => {
+    if (loading) {
+      return
+    }
+
     if (!navigator.geolocation) {
       setErrorMessage('Geolocation is not supported by your browser.')
       return
@@ -189,11 +209,13 @@ const Weather = () => {
   }
 
   const handleFavoriteToggle = () => {
-    if (!data?.name) return
+    if (!data?.name) {
+      return
+    }
 
     const normalizedCity = data.name.trim().toLowerCase()
     const nextFavorites = favoriteCities.includes(normalizedCity)
-      ? favoriteCities
+      ? favoriteCities.filter((favoriteCity) => favoriteCity !== normalizedCity)
       : [...favoriteCities, normalizedCity]
 
     setFavoriteCities(nextFavorites)
@@ -217,10 +239,17 @@ const Weather = () => {
               }
             }}
           />
-          <button type="button" className="locationButton" onClick={handleUseLocation}>
-            📍 Use My Location
+          <button
+            type="button"
+            className="locationButton"
+            onClick={handleUseLocation}
+            disabled={loading}
+          >
+            {loading ? 'Locating...' : '📍 Use My Location'}
           </button>
-          <button type="button" onClick={handleSearch}>Search</button>
+          <button type="button" onClick={handleSearch} disabled={loading}>
+            {loading ? 'Searching...' : 'Search'}
+          </button>
         </div>
 
         {loading && (
@@ -239,8 +268,8 @@ const Weather = () => {
                 type="button"
                 className={`favoriteButton ${isFavorite ? 'saved' : ''}`}
                 onClick={handleFavoriteToggle}
-                aria-label={`Save ${data.name} to favorites`}
-                title="Save to favorites"
+                aria-label={`${isFavorite ? 'Remove' : 'Save'} ${data.name} ${isFavorite ? 'from' : 'to'} favorites`}
+                title={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
               >
                 ★
               </button>
@@ -253,6 +282,7 @@ const Weather = () => {
             <p>Wind {data.wind.speed} m/s</p>
             <p>Humidity {data.main.humidity}%</p>
             <p>Pressure {data.main.pressure} hPa</p>
+            {lastUpdated && <p className="updatedAt">Updated at {lastUpdated}</p>}
           </div>
         )}
 

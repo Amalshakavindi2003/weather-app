@@ -78,6 +78,13 @@ function ForecastPage() {
     }
   }
 
+  const handleReset = () => {
+    setCity('')
+    setDisplayCity('')
+    setForecastDays([])
+    setErrorMessage('')
+  }
+
   return (
     <div className="forecastPage container">
       <h1 className="title">Forecast</h1>
@@ -92,6 +99,9 @@ function ForecastPage() {
         />
         <button type="submit" disabled={loading}>
           {loading ? 'Loading...' : 'Show Forecast'}
+        </button>
+        <button type="button" className="secondaryButton" onClick={handleReset} disabled={loading}>
+          Clear
         </button>
       </form>
 

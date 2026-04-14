@@ -102,6 +102,21 @@ function FavoritesPage() {
     )
   }
 
+  const clearAllFavorites = () => {
+    if (!favorites.length) {
+      return
+    }
+
+    const confirmed = window.confirm('Remove all saved favorites?')
+
+    if (!confirmed) {
+      return
+    }
+
+    writeFavorites([])
+    setFavorites([])
+  }
+
   const handleCardClick = (cityName) => {
     navigate(`/?city=${encodeURIComponent(cityName)}`)
   }
@@ -121,6 +136,18 @@ function FavoritesPage() {
     <div className="favoritesPage container">
       <h1 className="title">Favorites</h1>
       <p className="pageSubtitle">Saved cities load fresh weather data every time you open this page.</p>
+
+      <div className="favoritesToolbar">
+        <p className="favoritesCount">Saved cities: {favorites.length}</p>
+        <button
+          type="button"
+          className="removeFavoriteButton secondaryButton"
+          onClick={clearAllFavorites}
+          disabled={loading || favorites.length === 0}
+        >
+          Clear All
+        </button>
+      </div>
 
       {loading && <p className="loading">Loading favorites...</p>}
       {error && <p className="loading">{error}</p>}
