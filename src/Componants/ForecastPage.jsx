@@ -10,8 +10,10 @@ import {
   YAxis,
 } from 'recharts'
 import axiosInstance from './axiosInstance'
+import usePageTitle from './usePageTitle'
+import { getFriendlyErrorMessage, requireApiKey } from './weatherApi'
 
-const API_KEY = import.meta.env.VITE_API_KEY ?? import.meta.env.API_KEY
+const PAGE_TITLE = 'Weather App | Forecast'
 
 function formatChartDate(dateString) {
   return new Date(dateString).toLocaleDateString([], {
@@ -21,6 +23,8 @@ function formatChartDate(dateString) {
 }
 
 function ForecastPage() {
+  usePageTitle(PAGE_TITLE)
+
   const [city, setCity] = useState('')
   const [displayCity, setDisplayCity] = useState('')
   const [forecastDays, setForecastDays] = useState([])
@@ -42,13 +46,15 @@ function ForecastPage() {
       setErrorMessage('')
       setForecastDays([])
 
-      if (!API_KEY) {
-        throw new Error('API key is missing')
-      }
+      const apiKey = requireApiKey()
 
-      const response = await axiosInstance.get(
-        `/forecast?q=${encodeURIComponent(trimmedCity)}&appid=${API_KEY}&units=metric`,
-      )
+      const response = await axiosInstance.get('/forecast', {
+        params: {
+          q: trimmedCity,
+          appid: apiKey,
+          units: 'metric',
+        },
+      })
 
       const dailyEntries = response.data.list.filter((item) => item.dt_txt.includes('12:00:00'))
 
@@ -69,8 +75,7 @@ function ForecastPage() {
       setCity(response.data.city.name)
       setForecastDays(nextDays)
     } catch (requestError) {
-      const message = requestError instanceof Error ? requestError.message : 'Unable to load forecast data'
-      setErrorMessage(message)
+      setErrorMessage(getFriendlyErrorMessage(requestError, 'Unable to load forecast data right now.'))
       setForecastDays([])
       setDisplayCity('')
     } finally {

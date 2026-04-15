@@ -2,9 +2,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import axiosInstance from './axiosInstance'
 import Endpoints from './EndPoints'
+import usePageTitle from './usePageTitle'
+import { getFriendlyErrorMessage, requireApiKey } from './weatherApi'
 
-const API_KEY = import.meta.env.VITE_API_KEY ?? import.meta.env.API_KEY
 const FAVORITES_STORAGE_KEY = 'weatherAppFavorites'
+const PAGE_TITLE = 'Weather App | Home'
 
 function readFavorites() {
   try {
@@ -44,6 +46,8 @@ function getLastUpdatedText(date = new Date()) {
 }
 
 const Weather = () => {
+  usePageTitle(PAGE_TITLE)
+
   const [city, setCity] = useState('')
   const [data, setData] = useState(null)
   const [forecast, setForecast] = useState(null)
@@ -77,16 +81,24 @@ const Weather = () => {
         setLoading(true)
         setErrorMessage('')
 
-        if (!API_KEY) {
-          throw new Error('API key is missing')
-        }
+        const apiKey = requireApiKey()
 
-        const weatherResponse = await axiosInstance.get(
-          `${Endpoints.weather}?q=${encodeURIComponent(trimmedCity)}&appid=${API_KEY}&units=metric`,
-        )
-        const forecastResponse = await axiosInstance.get(
-          `${Endpoints.forecast}?q=${encodeURIComponent(trimmedCity)}&appid=${API_KEY}&units=metric`,
-        )
+        const [weatherResponse, forecastResponse] = await Promise.all([
+          axiosInstance.get(Endpoints.weather, {
+            params: {
+              q: trimmedCity,
+              appid: apiKey,
+              units: 'metric',
+            },
+          }),
+          axiosInstance.get(Endpoints.forecast, {
+            params: {
+              q: trimmedCity,
+              appid: apiKey,
+              units: 'metric',
+            },
+          }),
+        ])
 
         setForecast(forecastResponse.data)
         setData(weatherResponse.data)
@@ -96,8 +108,8 @@ const Weather = () => {
         if (options.updateUrl !== false) {
           navigate(`/?city=${encodeURIComponent(weatherResponse.data.name)}`, { replace: true })
         }
-      } catch {
-        setErrorMessage('Unable to find that city. Please try another city name.')
+      } catch (error) {
+        setErrorMessage(getFriendlyErrorMessage(error, 'Unable to load weather data right now. Please try again.'))
         setData(null)
         setForecast(null)
       } finally {
@@ -113,24 +125,34 @@ const Weather = () => {
         setLoading(true)
         setErrorMessage('')
 
-        if (!API_KEY) {
-          throw new Error('API key is missing')
-        }
+        const apiKey = requireApiKey()
 
-        const weatherResponse = await axiosInstance.get(
-          `${Endpoints.weather}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`,
-        )
-        const forecastResponse = await axiosInstance.get(
-          `${Endpoints.forecast}?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`,
-        )
+        const [weatherResponse, forecastResponse] = await Promise.all([
+          axiosInstance.get(Endpoints.weather, {
+            params: {
+              lat: latitude,
+              lon: longitude,
+              appid: apiKey,
+              units: 'metric',
+            },
+          }),
+          axiosInstance.get(Endpoints.forecast, {
+            params: {
+              lat: latitude,
+              lon: longitude,
+              appid: apiKey,
+              units: 'metric',
+            },
+          }),
+        ])
 
         setForecast(forecastResponse.data)
         setData(weatherResponse.data)
         setCity(weatherResponse.data.name)
         setLastUpdated(getLastUpdatedText())
         navigate(`/?city=${encodeURIComponent(weatherResponse.data.name)}`, { replace: true })
-      } catch {
-        setErrorMessage('Unable to load weather for your location right now. Please try again.')
+      } catch (error) {
+        setErrorMessage(getFriendlyErrorMessage(error, 'Unable to load weather for your location right now. Please try again.'))
         setData(null)
         setForecast(null)
       } finally {
@@ -223,112 +245,110 @@ const Weather = () => {
   }
 
   return (
-    <>
-      <div className="container">
-        <h1 className="title weatherGreeting">{greeting}</h1>
-        <p className="pageSubtitle weatherSubtitle">Search any city to get started</p>
-        <div className="searchBox">
-          <input
-            type="text"
-            placeholder="Search city..."
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                handleSearch()
-              }
-            }}
-          />
-          <button
-            type="button"
-            className="locationButton"
-            onClick={handleUseLocation}
-            disabled={loading}
-          >
-            {loading ? 'Locating...' : '📍 Use My Location'}
-          </button>
-          <button type="button" onClick={handleSearch} disabled={loading}>
-            {loading ? 'Searching...' : 'Search'}
-          </button>
+    <div className="container">
+      <h1 className="title weatherGreeting">{greeting}</h1>
+      <p className="pageSubtitle weatherSubtitle">Search any city to get started</p>
+      <div className="searchBox">
+        <input
+          type="text"
+          placeholder="Search city..."
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              handleSearch()
+            }
+          }}
+        />
+        <button
+          type="button"
+          className="locationButton"
+          onClick={handleUseLocation}
+          disabled={loading}
+        >
+          {loading ? 'Locating...' : '📍 Use My Location'}
+        </button>
+        <button type="button" onClick={handleSearch} disabled={loading}>
+          {loading ? 'Searching...' : 'Search'}
+        </button>
+      </div>
+
+      {loading && (
+        <div className="weatherStatus" role="status" aria-live="polite">
+          <span className="loadingSpinner" aria-hidden="true" />
+          <p className="loading">Loading weather...</p>
         </div>
+      )}
+      {!loading && errorMessage && <p className="weatherError">{errorMessage}</p>}
 
-        {loading && (
-          <div className="weatherStatus" role="status" aria-live="polite">
-            <span className="loadingSpinner" aria-hidden="true" />
-            <p className="loading">Loading weather...</p>
+      {data && (
+        <div className="mainCard">
+          <div className="mainCardHeader">
+            <h2>{data.name}</h2>
+            <button
+              type="button"
+              className={`favoriteButton ${isFavorite ? 'saved' : ''}`}
+              onClick={handleFavoriteToggle}
+              aria-label={`${isFavorite ? 'Remove' : 'Save'} ${data.name} ${isFavorite ? 'from' : 'to'} favorites`}
+              title={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
+            >
+              ★
+            </button>
           </div>
-        )}
-        {!loading && errorMessage && <p className="weatherError">{errorMessage}</p>}
+          <h1>
+            {data.main.temp}
+            {'\u00B0'}C
+          </h1>
+          <p>{data.weather[0].main}</p>
+          <p>Wind {data.wind.speed} m/s</p>
+          <p>Humidity {data.main.humidity}%</p>
+          <p>Pressure {data.main.pressure} hPa</p>
+          {lastUpdated && <p className="updatedAt">Updated at {lastUpdated}</p>}
+        </div>
+      )}
 
-        {data && (
-          <div className="mainCard">
-            <div className="mainCardHeader">
-              <h2>{data.name}</h2>
-              <button
-                type="button"
-                className={`favoriteButton ${isFavorite ? 'saved' : ''}`}
-                onClick={handleFavoriteToggle}
-                aria-label={`${isFavorite ? 'Remove' : 'Save'} ${data.name} ${isFavorite ? 'from' : 'to'} favorites`}
-                title={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
-              >
-                ★
-              </button>
+      <div className="hourlyWrapper">
+        <div className="hourly">
+          {forecast?.list?.slice(0, 6).map((item) => (
+            <div key={item.dt} className="hourBox">
+              <p>
+                {new Date(item.dt_txt).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </p>
+              <h3>
+                {item.main.temp}
+                {'\u00B0'}C
+              </h3>
             </div>
-            <h1>
-              {data.main.temp}
-              {'\u00B0'}C
-            </h1>
-            <p>{data.weather[0].main}</p>
-            <p>Wind {data.wind.speed} m/s</p>
-            <p>Humidity {data.main.humidity}%</p>
-            <p>Pressure {data.main.pressure} hPa</p>
-            {lastUpdated && <p className="updatedAt">Updated at {lastUpdated}</p>}
-          </div>
-        )}
+          ))}
+        </div>
+      </div>
 
-        <div className="hourlyWrapper">
-          <div className="hourly">
-            {forecast?.list?.slice(0, 6).map((item, i) => (
-              <div key={i} className="hourBox">
-                <p>
-                  {new Date(item.dt_txt).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
+      <div className="daily">
+        {forecast?.list
+          ?.filter((_, index) => index % 8 === 0)
+          .map((item) => {
+            const weather = item.weather[0].main
+
+            return (
+              <div key={item.dt} className="dayCard">
+                <p>{item.dt_txt.split(' ')[0]}</p>
+                <img
+                  src={`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
+                  alt={weather}
+                />
+                <p>{weather}</p>
                 <h3>
                   {item.main.temp}
                   {'\u00B0'}C
                 </h3>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="daily">
-          {forecast?.list
-            ?.filter((_, i) => i % 8 === 0)
-            .map((item, i) => {
-              const weather = item.weather[0].main
-
-              return (
-                <div key={i} className="dayCard">
-                  <p>{item.dt_txt.split(' ')[0]}</p>
-                  <img
-                    src={`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
-                    alt="weather"
-                  />
-                  <p>{weather}</p>
-                  <h3>
-                    {item.main.temp}
-                    {'\u00B0'}C
-                  </h3>
-                </div>
-              )
-            })}
-        </div>
+            )
+          })}
       </div>
-    </>
+    </div>
   )
 }
 

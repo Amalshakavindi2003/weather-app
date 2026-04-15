@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import axiosInstance from './axiosInstance'
 import Endpoints from './EndPoints'
+import usePageTitle from './usePageTitle'
+import { getFriendlyErrorMessage, requireApiKey } from './weatherApi'
 
-const API_KEY = import.meta.env.VITE_API_KEY ?? import.meta.env.API_KEY
+const PAGE_TITLE = 'Weather App | Compare Cities'
 
 function formatTemperature(value) {
   return `${Math.round(value)}°C`
@@ -28,6 +30,8 @@ function getMetricClass(firstValue, secondValue, isFirstCity, higherIsBetter) {
 }
 
 function ComparePage() {
+  usePageTitle(PAGE_TITLE)
+
   const [leftInput, setLeftInput] = useState('')
   const [rightInput, setRightInput] = useState('')
   const [leftQuery, setLeftQuery] = useState('')
@@ -63,22 +67,23 @@ function ComparePage() {
         setLeftError('')
         setLeftData(null)
 
-        if (!API_KEY) {
-          throw new Error('API key is missing')
-        }
+        const apiKey = requireApiKey()
 
-        const response = await axiosInstance.get(
-          `${Endpoints.weather}?q=${encodeURIComponent(leftQuery)}&appid=${API_KEY}&units=metric`,
-        )
+        const response = await axiosInstance.get(Endpoints.weather, {
+          params: {
+            q: leftQuery,
+            appid: apiKey,
+            units: 'metric',
+          },
+        })
 
         if (!cancelled) {
           setLeftData(response.data)
         }
       } catch (error) {
         if (!cancelled) {
-          const message = error instanceof Error ? error.message : 'Unable to load weather data'
           setLeftData(null)
-          setLeftError(message)
+          setLeftError(getFriendlyErrorMessage(error, 'Unable to load the first city right now.'))
         }
       } finally {
         if (!cancelled) {
@@ -114,22 +119,23 @@ function ComparePage() {
         setRightError('')
         setRightData(null)
 
-        if (!API_KEY) {
-          throw new Error('API key is missing')
-        }
+        const apiKey = requireApiKey()
 
-        const response = await axiosInstance.get(
-          `${Endpoints.weather}?q=${encodeURIComponent(rightQuery)}&appid=${API_KEY}&units=metric`,
-        )
+        const response = await axiosInstance.get(Endpoints.weather, {
+          params: {
+            q: rightQuery,
+            appid: apiKey,
+            units: 'metric',
+          },
+        })
 
         if (!cancelled) {
           setRightData(response.data)
         }
       } catch (error) {
         if (!cancelled) {
-          const message = error instanceof Error ? error.message : 'Unable to load weather data'
           setRightData(null)
-          setRightError(message)
+          setRightError(getFriendlyErrorMessage(error, 'Unable to load the second city right now.'))
         }
       } finally {
         if (!cancelled) {
