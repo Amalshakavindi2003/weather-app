@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import axios from 'axios'
 import axiosInstance from './axiosInstance'
+import usePageTitle from './usePageTitle'
+import { getFriendlyErrorMessage, requireApiKey } from './weatherApi'
 
-const API_KEY = import.meta.env.VITE_API_KEY ?? import.meta.env.API_KEY
+const PAGE_TITLE = 'Weather App | Air Quality'
 
 const AQI_LABELS = {
   1: { label: 'Good', className: 'aqiGood' },
@@ -13,6 +15,8 @@ const AQI_LABELS = {
 }
 
 function AirQualityPage() {
+  usePageTitle(PAGE_TITLE)
+
   const [city, setCity] = useState('')
   const [aqData, setAqData] = useState(null)
   const [locationName, setLocationName] = useState('')
@@ -25,6 +29,7 @@ function AirQualityPage() {
     const trimmedCity = city.trim()
 
     if (!trimmedCity) {
+      setError('Please enter a city name.')
       return
     }
 
@@ -33,42 +38,43 @@ function AirQualityPage() {
       setError('')
       setAqData(null)
 
-      if (!API_KEY) {
-        throw new Error('API key is missing')
-      }
+      const apiKey = requireApiKey()
 
       const geoResponse = await axios.get('https://api.openweathermap.org/geo/1.0/direct', {
         params: {
           q: trimmedCity,
           limit: 1,
-          appid: API_KEY,
+          appid: apiKey,
         },
       })
 
       const cityResult = geoResponse.data?.[0]
 
       if (!cityResult) {
-        throw new Error('City not found')
+        throw new Error('Unable to find that city. Please check the spelling and try again.')
       }
 
       const { lat, lon, name, state, country } = cityResult
       const locationDisplay = [name, state, country].filter(Boolean).join(', ')
 
-      const airResponse = await axiosInstance.get(
-        `/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`,
-      )
+      const airResponse = await axiosInstance.get('/air_pollution', {
+        params: {
+          lat,
+          lon,
+          appid: apiKey,
+        },
+      })
 
       const airEntry = airResponse.data?.list?.[0]
 
       if (!airEntry) {
-        throw new Error('Air quality data not available')
+        throw new Error('Air quality data is not available for this location right now.')
       }
 
       setLocationName(locationDisplay)
       setAqData(airEntry)
     } catch (requestError) {
-      const message = requestError instanceof Error ? requestError.message : 'Unable to load air quality data'
-      setError(message)
+      setError(getFriendlyErrorMessage(requestError, 'Unable to load air quality data right now.'))
       setAqData(null)
     } finally {
       setLoading(false)
@@ -91,11 +97,13 @@ function AirQualityPage() {
           value={city}
           onChange={(event) => setCity(event.target.value)}
         />
-        <button type="submit">Check AQI</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Loading...' : 'Check AQI'}
+        </button>
       </form>
 
       {loading && <p className="loading">Loading air quality...</p>}
-      {error && <p className="loading">{error}</p>}
+      {!loading && error && <p className="weatherError">{error}</p>}
 
       {aqData && levelInfo && (
         <section className="aqiPanel">

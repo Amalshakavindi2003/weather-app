@@ -39,9 +39,17 @@
   --nav-link: rgba(23, 50, 77, 0.82);
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
-  font-family: "Segoe UI", sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   background: var(--page-bg);
   color: var(--page-text);
   transition: background 0.25s ease, color 0.25s ease;
@@ -50,6 +58,13 @@ body {
 button,
 input {
   font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(255, 123, 0, 0.55);
+  outline-offset: 2px;
 }
 
 #root {
@@ -61,14 +76,12 @@ input {
 }
 
 .appContent {
-  padding-top: 84px;
+  padding: 20px 0 28px;
 }
 
 .navbar {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -87,12 +100,14 @@ input {
   font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: 0.4px;
+  white-space: nowrap;
 }
 
 .navActions {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .navLinks {
@@ -200,13 +215,14 @@ input {
   background: var(--button-bg);
   color: var(--button-text);
   cursor: pointer;
-  transition: 0.3s;
+  transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
 }
 
 .searchBox button:hover,
 .favoriteButton:hover,
 .removeFavoriteButton:hover {
   background: var(--button-hover);
+  transform: translateY(-1px);
 }
 
 .favoriteButton {
@@ -226,7 +242,7 @@ input {
   background: var(--surface);
   padding: 30px;
   border-radius: 20px;
-  width: 280px;
+  width: min(100%, 280px);
   margin: auto;
   backdrop-filter: blur(15px);
   box-shadow: var(--card-shadow);
@@ -260,6 +276,15 @@ input {
   gap: 20px;
   overflow-x: auto;
   padding: 10px;
+  max-width: 100%;
+}
+
+.hourBox {
+  min-width: 112px;
+  padding: 14px 12px;
+  border-radius: 16px;
+  background: var(--surface-soft);
+  box-shadow: var(--card-shadow);
 }
 
 .daily {
@@ -276,13 +301,13 @@ input {
   padding: 15px;
   text-align: center;
   backdrop-filter: blur(10px);
-  transition: 0.3s;
+  transition: transform 0.3s ease;
   color: var(--page-text);
   box-shadow: var(--card-shadow);
 }
 
 .dayCard:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .dayCard img {
@@ -300,9 +325,11 @@ input {
   0% {
     opacity: 0.3;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0.3;
   }
@@ -519,57 +546,6 @@ input {
   padding: 10px 16px;
 }
 
-@media (max-width: 900px) {
-  .compareInputs,
-  .compareGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .searchBox {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .searchBox input {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .navbar {
-    padding: 14px 18px;
-  }
-
-  .navActions {
-    gap: 8px;
-  }
-}
-
-@media (max-width: 560px) {
-  .navBrand {
-    font-size: 1rem;
-  }
-
-  .navLinks {
-    gap: 8px;
-  }
-
-  .navLink {
-    padding: 8px 12px;
-  }
-
-  .title {
-    font-size: 28px;
-  }
-
-  .mainCard {
-    width: auto;
-  }
-
-  .favoriteCardFooter {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
 .airQualityPage {
   padding-bottom: 28px;
 }
@@ -662,21 +638,12 @@ input {
   color: var(--page-text);
 }
 
-@media (max-width: 560px) {
-  .aqiMeter {
-    width: 180px;
-    height: 180px;
-  }
-
-  .aqiValue {
-    font-size: 3.2rem;
-  }
-}
 .locationButton {
   white-space: nowrap;
 }
 
-.weatherStatus {
+.weatherStatus,
+.forecastStatus {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -703,6 +670,7 @@ input {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -713,23 +681,17 @@ input {
   border-top-color: var(--button-bg);
 }
 
-:root[data-theme='light'] .weatherError {
+:root[data-theme='light'] .weatherError,
+:root[data-theme='light'] .inlineFormError {
   color: #b33434;
 }
+
 .forecastPage {
   padding-bottom: 28px;
 }
 
 .forecastSearch {
   margin-bottom: 20px;
-}
-
-.forecastStatus {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 8px;
 }
 
 .forecastError {
@@ -803,11 +765,6 @@ input {
   font-weight: 700;
 }
 
-@media (max-width: 640px) {
-  .forecastChartCard {
-    padding: 12px 12px 0;
-  }
-}
 .weatherGreeting {
   margin-bottom: 6px;
 }
@@ -816,13 +773,11 @@ input {
   margin-bottom: 18px;
   font-size: 0.98rem;
 }
+
 .inlineFormError {
   margin: 10px 0 0;
   color: #ffd0d0;
   font-size: 0.9rem;
-}
-:root[data-theme='light'] .inlineFormError {
-  color: #b33434;
 }
 
 .searchBox button:disabled,
@@ -831,6 +786,7 @@ input {
 .secondaryButton:disabled {
   opacity: 0.68;
   cursor: not-allowed;
+  transform: none;
 }
 
 .updatedAt {
@@ -864,7 +820,64 @@ input {
   background: var(--surface-soft) !important;
 }
 
+@media (max-width: 900px) {
+  .compareInputs,
+  .compareGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .searchBox {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchBox input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .navbar {
+    padding: 14px 18px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .navActions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .navLinks {
+    justify-content: flex-start;
+  }
+}
+
 @media (max-width: 560px) {
+  .navBrand {
+    font-size: 1rem;
+  }
+
+  .navLinks {
+    gap: 8px;
+  }
+
+  .navLink {
+    padding: 8px 12px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .mainCard {
+    width: auto;
+  }
+
+  .favoriteCardFooter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .favoritesToolbar {
     flex-direction: column;
     align-items: stretch;
@@ -872,5 +885,18 @@ input {
 
   .favoritesToolbar .secondaryButton {
     width: 100%;
+  }
+
+  .aqiMeter {
+    width: 180px;
+    height: 180px;
+  }
+
+  .aqiValue {
+    font-size: 3.2rem;
+  }
+
+  .forecastChartCard {
+    padding: 12px 12px 0;
   }
 }

@@ -1,20 +1,57 @@
-# React + Vite
+# Weather App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive React + Vite weather dashboard for checking current conditions, comparing cities, saving favorites, reviewing air quality, and exploring short-term forecasts in a polished light/dark interface.
 
-Currently, two official plugins are available:
+[Live Demo](your-vercel-link)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Screenshot
 
-## React Compiler
+_Add a screenshot of the app here._
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- Current weather search
+- Hourly and 5-day forecast
+- City comparison
+- Favorites with localStorage
+- Air Quality Index with color coding
+- 7-day temperature chart with Recharts
+- Geolocation auto-detect
+- Dark / Light mode toggle
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tech Stack
 
-## Project update
+- React
+- Vite
+- JavaScript
+- CSS
+- OpenWeatherMap API
+- Recharts
 
-- Minor documentation refresh for PR workflow on 2026-04-14.
+## Run Locally
+
+```bash
+git clone https://github.com/Amalshakavindi2003/weather-app.git
+cd weather-app
+npm install
+```
+
+Create a `.env` file in the project root and add:
+
+```env
+VITE_API_KEY=your_openweathermap_api_key_here
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+## Author
+
+Ella Deniyage Kavindi
+
+## GitHub
+
+https://github.com/Amalshakavindi2003

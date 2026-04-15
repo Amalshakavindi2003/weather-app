@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axiosInstance from './axiosInstance'
 import Endpoints from './EndPoints'
+import usePageTitle from './usePageTitle'
+import { getFriendlyErrorMessage, requireApiKey } from './weatherApi'
 
-const API_KEY = import.meta.env.VITE_API_KEY ?? import.meta.env.API_KEY
 const FAVORITES_STORAGE_KEY = 'weatherAppFavorites'
+const PAGE_TITLE = 'Weather App | Favorites'
 
 function readFavorites() {
   try {
@@ -22,6 +24,8 @@ function writeFavorites(favorites) {
 }
 
 function FavoritesPage() {
+  usePageTitle(PAGE_TITLE)
+
   const [favorites, setFavorites] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -40,19 +44,17 @@ function FavoritesPage() {
         return
       }
 
-      if (!API_KEY) {
-        setFavorites([])
-        setError('API key is missing')
-        setLoading(false)
-        return
-      }
-
       try {
+        const apiKey = requireApiKey()
         const responses = await Promise.allSettled(
           storedFavorites.map((favoriteCity) =>
-            axiosInstance.get(
-              `${Endpoints.weather}?q=${encodeURIComponent(favoriteCity)}&appid=${API_KEY}&units=metric`,
-            ),
+            axiosInstance.get(Endpoints.weather, {
+              params: {
+                q: favoriteCity,
+                appid: apiKey,
+                units: 'metric',
+              },
+            }),
           ),
         )
 
@@ -81,8 +83,8 @@ function FavoritesPage() {
         })
 
         setFavorites(nextFavorites)
-      } catch {
-        setError('Unable to load favorites')
+      } catch (error) {
+        setError(getFriendlyErrorMessage(error, 'Unable to load favorites right now.'))
       } finally {
         setLoading(false)
       }
@@ -150,7 +152,7 @@ function FavoritesPage() {
       </div>
 
       {loading && <p className="loading">Loading favorites...</p>}
-      {error && <p className="loading">{error}</p>}
+      {!loading && error && <p className="weatherError">{error}</p>}
 
       {!loading && !error && favorites.length === 0 && (
         <p className="emptyState">No favorites saved yet. Add one from the Home page.</p>
